@@ -10,6 +10,8 @@ import { useState } from "react"
 import { supabase } from "@/lib/supabase"
 
 export default function RegisterPage() {
+  console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL)
+console.log("KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.slice(0, 20))
   const [name, setName] = useState("")
 const [email, setEmail] = useState("")
 const [password, setPassword] = useState("")

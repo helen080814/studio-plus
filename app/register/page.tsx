@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 import { Mail, User, Lock, ScanFace } from "lucide-react"
 import { AuthShell } from "@/components/auth-shell"
@@ -5,8 +6,44 @@ import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { useState } from "react"
+import { supabase } from "@/lib/supabase"
 
 export default function RegisterPage() {
+  const [name, setName] = useState("")
+const [email, setEmail] = useState("")
+const [password, setPassword] = useState("")
+const [loading, setLoading] = useState(false)
+
+const handleRegister = async () => {
+  try {
+    setLoading(true)
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
+    })
+
+    if (error) {
+      alert(error.message)
+      return
+    }
+
+    alert(
+      "Cuenta creada correctamente. Revisa tu correo para verificar tu cuenta."
+    )
+  } catch (err) {
+    console.error(err)
+    alert("Ocurrió un error al registrar la cuenta.")
+  } finally {
+    setLoading(false)
+  }
+}
   return (
     <AuthShell
       title="Crea tu cuenta"
@@ -27,6 +64,8 @@ export default function RegisterPage() {
             <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="name"
+              value={name}
+onChange={(e) => setName(e.target.value)}
               type="text"
               placeholder="Nombre"
               autoComplete="name"
@@ -41,6 +80,8 @@ export default function RegisterPage() {
             <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="email"
+              value={email}
+onChange={(e) => setEmail(e.target.value)}
               type="email"
               placeholder="tu@correo.edu"
               autoComplete="email"
@@ -55,6 +96,8 @@ export default function RegisterPage() {
             <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="password"
+              value={password}
+onChange={(e) => setPassword(e.target.value)}
               type="password"
               placeholder="••••••••"
               autoComplete="new-password"
@@ -78,13 +121,17 @@ export default function RegisterPage() {
           </span>
           <span className="text-xs font-medium text-primary">Configurar</span>
         </button>
-
-        <Link
-          href="/dashboard"
-          className={cn(buttonVariants(), "mt-1 h-11 rounded-xl text-sm font-medium shadow-lg shadow-primary/25")}
-        >
-          Crear Cuenta
-        </Link>
+        <button
+  type="button"
+  onClick={handleRegister}
+  disabled={loading}
+  className={cn(
+    buttonVariants(),
+    "mt-1 h-11 rounded-xl text-sm font-medium shadow-lg shadow-primary/25"
+  )}
+>
+  {loading ? "Creando cuenta..." : "Crear Cuenta"}
+</button>
       </form>
     </AuthShell>
   )
